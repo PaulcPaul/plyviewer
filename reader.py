@@ -9,7 +9,7 @@ def read_model_points():
     end_header_check = False
     end_points_check = False
 
-    with open(file_paths[2]) as f:
+    with open(file_paths[1]) as f:
         count = 1
         for line in f.readlines():
             if line.startswith("element vertex"):
@@ -35,11 +35,16 @@ def read_model_points():
     num_points = len(vertex_list)
     num_faces = len(face_list)
 
-    return vertex_list, face_list, num_points, num_faces
+    # TODO actually calculate normals
+    normal_list = [[1.0, 1.0, 1.0] for x in vertex_list]
+    num_normals = len(normal_list)
+
+    return vertex_list, face_list, normal_list, num_normals, num_points, num_faces
 
 
 if __name__ == "__main__":
-    vertex_list, face_list, num_points, num_faces = read_model_points()
+    vertex_list, face_list, normal_list, num_normals, num_points, num_faces = read_model_points()
 
     print(f"Loaded {num_points} points.")
     print(f"Loaded {num_faces} faces.")
+    print(f"Loaded {num_normals} normals.")

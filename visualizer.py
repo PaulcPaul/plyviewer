@@ -6,19 +6,47 @@ import numpy as np
 
 from reader import read_model_points
 
-points, tris, num_points, num_faces = read_model_points()
+# variables for bunny model
+points, tris, normals, num_normals, num_points, num_faces = read_model_points()
 flat_tris = [item for sublist in tris for item in sublist]
 num_tris = len(flat_tris)
 
 spin = 0
 
 def init():
-    global points, num_points
+    global points, normals, num_points
+
+    luzAmbiente  = [0.2, 0.2, 0.2, 1.0]
+    luzDifusa    = [0.7, 0.7, 0.7, 1.0]
+    luzEspecular = [1.0, 1.0, 1.0, 1.0] 
+    posicaoLuz   = [0.0, 50.0, 50.0, 1.0]
+
+    especularidade = [1.0, 1.0, 1.0, 1.0]
+    especMaterial  = 100
+
     glClearColor (0.0, 0.0, 0.0, 0.0)
     glShadeModel (GL_SMOOTH)
 
+    glMaterialfv(GL_FRONT, GL_SPECULAR, especularidade)
+    glMateriali(GL_FRONT, GL_SHININESS, especMaterial)
+
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente)
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente)
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa )
+    glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular)
+    glLightfv(GL_LIGHT0, GL_POSITION, posicaoLuz)
+
+    glEnable(GL_COLOR_MATERIAL)
+    glEnable(GL_LIGHTING)
+    glEnable(GL_LIGHT0)
+    glEnable(GL_DEPTH_TEST)
+
+    glEnableClientState(GL_NORMAL_ARRAY)
     glEnableClientState(GL_VERTEX_ARRAY)
+
     glVertexPointer(3, GL_FLOAT, 0, points)
+    glNormalPointer(GL_FLOAT, 0, normals)
 
 def draw_axis():
     glColor3f(1.0, 0.0, 0.0)
@@ -40,17 +68,18 @@ def draw_axis():
     glEnd()
 
 def display():
-    global spin, tris, points, num_points, num_faces, flat_tris, num_tris
+    global spin, flat_tris, num_tris
 
-    glClear (GL_COLOR_BUFFER_BIT)
-    glColor3f (1.0, 0.0, 1.0)
+    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
 
     draw_axis()
 
-    glScalef (7.0, 7.0, 7.0)
+    glColor3f (1.0, 0.0, 0.0) # rabbit's color
+
+    glScalef (5.0, 5.0, 5.0)
     glTranslatef(0, -.05, -.05)
-    glRotatef(spin, 0, 1, 0)
+    glRotatef(spin, 1, 1, 1)
 
     glDrawElements(GL_TRIANGLES, num_tris, GL_UNSIGNED_INT, flat_tris)
 
