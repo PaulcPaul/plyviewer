@@ -17,12 +17,8 @@ def init():
     glClearColor (0.0, 0.0, 0.0, 0.0)
     glShadeModel (GL_SMOOTH)
 
-    vbo = glGenBuffers(1)
-    glBindBuffer(GL_ARRAY_BUFFER, vbo)
-    glBufferData(GL_ARRAY_BUFFER, num_points*12, np.array(points, dtype="float32"), GL_STATIC_DRAW)
-
     glEnableClientState(GL_VERTEX_ARRAY)
-    glVertexPointer(3, GL_FLOAT, 0, None)
+    glVertexPointer(3, GL_FLOAT, 0, points)
 
 def draw_axis():
     glColor3f(1.0, 0.0, 0.0)

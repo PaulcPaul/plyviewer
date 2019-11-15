@@ -1,0 +1,5 @@
+*tar.gz
+/.vscode
+/bunny
+/__pycache__
+teste.py
