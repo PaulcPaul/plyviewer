@@ -6,9 +6,13 @@ import numpy as np
 
 from reader import read_model_points
 
+w, h = 700, 700
+
 # variables for bunny model
 points, tris, normals, num_normals, num_points, num_faces = read_model_points()
-flat_tris = [item for sublist in tris for item in sublist]
+
+# for glDrawElements
+flat_tris = [item for sublist in tris for item in sublist] 
 num_tris = len(flat_tris)
 
 spin = 0
@@ -19,12 +23,12 @@ def init():
     luzAmbiente  = [0.2, 0.2, 0.2, 1.0]
     luzDifusa    = [0.7, 0.7, 0.7, 1.0]
     luzEspecular = [1.0, 1.0, 1.0, 1.0] 
-    posicaoLuz   = [0.0, 50.0, 50.0, 1.0]
+    posicaoLuz   = [60.0, 60.0, 0.0, 1.0]
 
     especularidade = [1.0, 1.0, 1.0, 1.0]
-    especMaterial  = 100
+    especMaterial  = 60
 
-    glClearColor (0.0, 0.0, 0.0, 0.0)
+    glClearColor (0.2, 0.2, 0.2, 0.3)
     glShadeModel (GL_SMOOTH)
 
     glMaterialfv(GL_FRONT, GL_SPECULAR, especularidade)
@@ -73,13 +77,15 @@ def display():
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
 
+    glTranslatef(0.0, -0.5, 0.0)
+
     draw_axis()
 
-    glColor3f (1.0, 0.0, 0.0) # rabbit's color
+    glColor3f (1.0, 0.0, 1.0) # rabbit's color
 
     glScalef (5.0, 5.0, 5.0)
-    glTranslatef(0, -.05, -.05)
-    glRotatef(spin, 1, 1, 1)
+    #glTranslatef(0, 0, 0)
+    glRotatef(spin, 0, 1, 0)
 
     glDrawElements(GL_TRIANGLES, num_tris, GL_UNSIGNED_INT, flat_tris)
 
@@ -107,8 +113,8 @@ def reshape (w, h):
 if __name__ == "__main__":
     glutInit()
     glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH)
-    glutInitWindowSize (500, 500)
-    glutInitWindowPosition (100, 100)
+    glutInitWindowSize (w, h)
+    glutInitWindowPosition (100, 0)
     glutCreateWindow ("Stuff")
     init()
     glutDisplayFunc(display)
