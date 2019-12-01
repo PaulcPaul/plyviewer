@@ -5,22 +5,17 @@ from OpenGL.GLU import *
 import numpy as np
 
 from reader import read_model_points
+from plymodel import PlyModel
 
 w, h = 700, 700
 
-# variables for bunny model
-points, tris, normals, num_normals, num_points, num_faces = read_model_points()
-
-# for glDrawElements
-flat_tris = [item for sublist in tris for item in sublist] 
-num_tris = len(flat_tris)
+model = PlyModel(*read_model_points())
 
 spin = 0
 
 def init():
-    global points, normals, num_points
+    global model
 
-    luzAmbiente  = [0.2, 0.2, 0.2, 1.0]
     luzDifusa    = [0.7, 0.7, 0.7, 1.0]
     luzEspecular = [1.0, 1.0, 1.0, 1.0] 
     posicaoLuz   = [60.0, 60.0, 0.0, 1.0]
@@ -28,15 +23,12 @@ def init():
     especularidade = [1.0, 1.0, 1.0, 1.0]
     especMaterial  = 60
 
-    glClearColor (0.2, 0.2, 0.2, 0.3)
-    glShadeModel (GL_SMOOTH)
+    glClearColor(0.2, 0.2, 0.2, 0.3)
+    glShadeModel(GL_SMOOTH)
 
     glMaterialfv(GL_FRONT, GL_SPECULAR, especularidade)
     glMateriali(GL_FRONT, GL_SHININESS, especMaterial)
 
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente)
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente)
     glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa )
     glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular)
     glLightfv(GL_LIGHT0, GL_POSITION, posicaoLuz)
@@ -49,8 +41,8 @@ def init():
     glEnableClientState(GL_NORMAL_ARRAY)
     glEnableClientState(GL_VERTEX_ARRAY)
 
-    glVertexPointer(3, GL_FLOAT, 0, points)
-    glNormalPointer(GL_FLOAT, 0, normals)
+    glVertexPointer(3, GL_FLOAT, 0, model.vertex_list)
+    glNormalPointer(GL_FLOAT, 0, model.normal_list)
 
 def draw_axis():
     glColor3f(1.0, 0.0, 0.0)
@@ -72,7 +64,7 @@ def draw_axis():
     glEnd()
 
 def display():
-    global spin, flat_tris, num_tris
+    global model
 
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
@@ -83,11 +75,11 @@ def display():
 
     glColor3f (1.0, 0.0, 1.0) # rabbit's color
 
-    glScalef (5.0, 5.0, 5.0)
+    #glScalef (5.0, 5.0, 5.0)
     #glTranslatef(0, 0, 0)
     glRotatef(spin, 0, 1, 0)
 
-    glDrawElements(GL_TRIANGLES, num_tris, GL_UNSIGNED_INT, flat_tris)
+    glDrawElements(GL_TRIANGLES, model.flattened_face_num, GL_UNSIGNED_INT, model.flattened_face_list)
 
     #glDrawArrays(GL_POINTS, 0, num_points)
 
@@ -107,7 +99,7 @@ def reshape (w, h):
     glViewport(0, 0, w, h)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-    #gluPerspective(90.0, 1.0, 1.5, 20.0)
+    gluPerspective(0.0, w/h, 1.0, 500.0)
     glMatrixMode(GL_MODELVIEW)
 
 if __name__ == "__main__":
