@@ -11,6 +11,8 @@ w, h = 700, 700
 
 model = PlyModel(*read_model_points())
 
+zoom = 1.0
+
 spin = 0
 
 def init():
@@ -21,7 +23,7 @@ def init():
     posicaoLuz   = [60.0, 60.0, 0.0, 1.0]
 
     especularidade = [1.0, 1.0, 1.0, 1.0]
-    especMaterial  = 60
+    especMaterial  = 40
 
     glClearColor(0.2, 0.2, 0.2, 0.3)
     glShadeModel(GL_SMOOTH)
@@ -64,7 +66,7 @@ def draw_axis():
     glEnd()
 
 def display():
-    global model
+    global model, zoom
 
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
@@ -75,25 +77,32 @@ def display():
 
     glColor3f (1.0, 0.0, 1.0) # rabbit's color
 
-    #glScalef (5.0, 5.0, 5.0)
-    #glTranslatef(0, 0, 0)
+    glScalef (zoom, zoom, zoom)
+    glTranslatef(0, 0, 0)
     glRotatef(spin, 0, 1, 0)
 
     glDrawElements(GL_TRIANGLES, model.flattened_face_num, GL_UNSIGNED_INT, model.flattened_face_list)
 
-    #glDrawArrays(GL_POINTS, 0, num_points)
-
     glutSwapBuffers()
 
-def Timer(value):
-    global spin
+def GerenciaTeclado(key, x, y):
+    global zoom, spin
 
-    spin += 2.0
-    if spin == 360.0:
-       spin = 0
+    key = key.decode("utf-8")
+    
+    if key == 'W' or key == 'w':
+        zoom += 0.1
+    if key == 'S' or key == 's':
+        zoom -= 0.1
+    if key == 'A' or key == 'a':
+        spin += 10
+    if key == 'D' or key == 'd':
+        spin -= 10
+
+    if zoom <= 0.0:
+        zoom = 0.1
 
     glutPostRedisplay()
-    glutTimerFunc(33, Timer, 1)
 
 def reshape (w, h):
     glViewport(0, 0, w, h)
@@ -111,5 +120,6 @@ if __name__ == "__main__":
     init()
     glutDisplayFunc(display)
     glutReshapeFunc(reshape)
-    glutTimerFunc(33, Timer, 1)
+    glutKeyboardFunc(GerenciaTeclado)
+    #glutTimerFunc(33, Timer, 1)
     glutMainLoop()
