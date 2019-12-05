@@ -13,27 +13,33 @@ model = PlyModel(*read_model_points())
 
 zoom = 1.0
 
-spin = 0
+spinx = 0
+spiny = 0
+
+mouse_pos = [0, 0]
 
 def init():
     global model
 
-    luzDifusa    = [0.7, 0.7, 0.7, 1.0]
-    luzEspecular = [1.0, 1.0, 1.0, 1.0] 
-    posicaoLuz   = [60.0, 60.0, 0.0, 1.0]
+    luzDifusa       = [0.7, 0.7, 0.7, 1.0]
+    luzEspecular    = [1.0, 1.0, 1.0, 1.0] 
+    posicaoDifusa   = [10.0, 10.0, 0.0, 1.0]
+    posicaoEspec    = [10.0, 10.0, 0.0, 1.0]
 
-    especularidade = [1.0, 1.0, 1.0, 1.0]
-    especMaterial  = 40
+    especularidade  = [1.0, 1.0, 1.0, 1.0]
+    especMaterial   = 40
 
-    glClearColor(0.2, 0.2, 0.2, 0.3)
+    glClearColor(0.2, 0.2, 0.2, 0.5)
     glShadeModel(GL_SMOOTH)
 
     glMaterialfv(GL_FRONT, GL_SPECULAR, especularidade)
     glMateriali(GL_FRONT, GL_SHININESS, especMaterial)
 
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa )
-    glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular)
-    glLightfv(GL_LIGHT0, GL_POSITION, posicaoLuz)
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa)
+    glLightfv(GL_LIGHT1, GL_SPECULAR, luzEspecular)
+    
+    glLightfv(GL_LIGHT0, GL_POSITION, posicaoDifusa)
+    glLightfv(GL_LIGHT1, GL_POSITION, posicaoEspec)
 
     glEnable(GL_COLOR_MATERIAL)
     glEnable(GL_LIGHTING)
@@ -79,25 +85,28 @@ def display():
 
     glScalef (zoom, zoom, zoom)
     glTranslatef(0, 0, 0)
-    glRotatef(spin, 0, 1, 0)
+    glRotatef(spinx, 0, 1, 0)
+    glRotatef(spiny, 1, 0, 0)
 
     glDrawElements(GL_TRIANGLES, model.flattened_face_num, GL_UNSIGNED_INT, model.flattened_face_list)
 
     glutSwapBuffers()
 
 def GerenciaTeclado(key, x, y):
-    global zoom, spin
+    global zoom, spinx, spiny, mouse_pos, h
 
     key = key.decode("utf-8")
     
-    if key == 'W' or key == 'w':
+    if key == 'Z' or key == 'z':
         zoom += 0.1
-    if key == 'S' or key == 's':
+    if key == 'X' or key == 'x':
         zoom -= 0.1
-    if key == 'A' or key == 'a':
-        spin += 10
-    if key == 'D' or key == 'd':
-        spin -= 10
+    
+    if key == 'R' or key == 'r':
+        spinx += mouse_pos[0] - x
+        spiny += mouse_pos[1] - y
+
+        mouse_pos = [x, y]
 
     if zoom <= 0.0:
         zoom = 0.1
