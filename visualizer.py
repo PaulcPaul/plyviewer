@@ -16,17 +16,23 @@ zoom = 1.0
 spinx = 0
 spiny = 0
 
+bunx = 0
+buny = 0
+
 mouse_pos = [0, 0]
 
+difusax = 50.0
+difusay = 50.0
+especx  = 50.0
+especy  = 50.0
+
+luzDifusa       = [1.0, 1.0, 1.0, 1.0]
+luzEspecular    = [1.0, 1.0, 1.0, 1.0] 
+
 def init():
-    global model
+    global model, especx, especy
 
-    luzDifusa       = [0.7, 0.7, 0.7, 1.0]
-    luzEspecular    = [1.0, 1.0, 1.0, 1.0] 
-    posicaoDifusa   = [10.0, 10.0, 0.0, 1.0]
-    posicaoEspec    = [10.0, 10.0, 0.0, 1.0]
-
-    especularidade  = [1.0, 1.0, 1.0, 1.0]
+    especularidade  = [0.5, 0.5, 1.0, 1.0]
     especMaterial   = 40
 
     glClearColor(0.2, 0.2, 0.2, 0.5)
@@ -35,15 +41,10 @@ def init():
     glMaterialfv(GL_FRONT, GL_SPECULAR, especularidade)
     glMateriali(GL_FRONT, GL_SHININESS, especMaterial)
 
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa)
-    glLightfv(GL_LIGHT1, GL_SPECULAR, luzEspecular)
-    
-    glLightfv(GL_LIGHT0, GL_POSITION, posicaoDifusa)
-    glLightfv(GL_LIGHT1, GL_POSITION, posicaoEspec)
-
     glEnable(GL_COLOR_MATERIAL)
     glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT0)
+    glEnable(GL_LIGHT1)
     glEnable(GL_DEPTH_TEST)
 
     glEnableClientState(GL_NORMAL_ARRAY)
@@ -72,19 +73,35 @@ def draw_axis():
     glEnd()
 
 def display():
-    global model, zoom
+    global model, zoom, luzDifusa, luzEspecular, difusax, difusay, especx, especy, bunx, buny
 
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
 
     glTranslatef(0.0, -0.5, 0.0)
 
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa)
+    glLightfv(GL_LIGHT1, GL_SPECULAR, luzEspecular)
+
+    posicaoDifusa   = [difusax, difusay, 1.0, 1.0]
+    posicaoEspec    = [especx, especy, 1.0, 1.0]
+
+    glPushMatrix()
+    glTranslated(difusax, difusay, 0.0)
+    glLightfv(GL_LIGHT0, GL_POSITION, posicaoDifusa)
+    glPopMatrix()
+
+    glPushMatrix()
+    glTranslated(especx, especy, 1.0)
+    glLightfv(GL_LIGHT1, GL_POSITION, posicaoEspec)
+    glPopMatrix()
+
     draw_axis()
 
-    glColor3f (1.0, 0.0, 1.0) # rabbit's color
+    glColor3f (0.5, 0.5, 0.5) # rabbit's color
 
     glScalef (zoom, zoom, zoom)
-    glTranslatef(0, 0, 0)
+    glTranslatef(bunx, buny, 0)
     glRotatef(spinx, 0, 1, 0)
     glRotatef(spiny, 1, 0, 0)
 
@@ -93,7 +110,7 @@ def display():
     glutSwapBuffers()
 
 def GerenciaTeclado(key, x, y):
-    global zoom, spinx, spiny, mouse_pos, h
+    global zoom, spinx, spiny, mouse_pos, h, difusax, difusay, especx, especy, bunx, buny
 
     key = key.decode("utf-8")
     
@@ -107,6 +124,17 @@ def GerenciaTeclado(key, x, y):
         spiny += mouse_pos[1] - y
 
         mouse_pos = [x, y]
+
+    if key == "D" or key == "d":
+        difusax = x
+        difusay = y
+    if key == "E" or key == "e":
+        especx = x
+        especy = y
+
+    if key == "T" or key == "t":
+        bunx = x/1000
+        buny = y/1000
 
     if zoom <= 0.0:
         zoom = 0.1
